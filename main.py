@@ -159,69 +159,52 @@ async def DynamicAdImage(
     color = ImageColor.getcolor(Hexcolor, "RGB")
     
 
-    # Define canvas size
     canvas_width = 1280
     canvas_height = 1280
 
-    # Create a white canvas
     canvas = Image.new("RGB", (canvas_width, canvas_height), "white")
 
     
     logo_content = await logo_file.read()
     logo = Image.open(io.BytesIO(logo_content))
 
-    # Load another image
     image_content = await image_file.read()
     image = Image.open(io.BytesIO(image_content))
     image = ImageOps.exif_transpose(image)
 
-    # Correct the orientation of the image
-    # image = image.rotate(270, expand=True)  # Adjust the angle if needed
-
-    # Calculate the position to center the logo at the top-middle of the canvas with a 20px margin
     logo_width, logo_height = logo.size
     logo_margin = 80
 
-    # Set the desired height for the logo
-    # Set the desired height for the logo
     desired_logo_height = 100
 
-    # Limit the logo's maximum height to the desired height
     max_logo_height = desired_logo_height
     max_logo_width = (max_logo_height / logo_height) * logo_width
     logo.thumbnail((max_logo_width, max_logo_height))
 
-    # Calculate the adjusted position after resizing
     adjusted_logo_position = (int((canvas_width - max_logo_width) // 2), int(logo_margin))
 
-    # Paste the resized logo onto the canvas
     canvas.paste(logo, adjusted_logo_position, logo.convert("RGBA"))
 
 
     image_margin_top = 50
-    # Calculate the position to center the second image at the middle of the canvas
     image_width, image_height = image.size
-    max_image_height = 600  # Set the maximum height
+    max_image_height = 600  
     max_image_width = (max_image_height / image_height) * image_width
     image.thumbnail((max_image_width, max_image_height))
 
-    # Calculate the position after resizing
     image_position = (
         int((canvas_width - image.width) // 2),
-        logo.height+logo_margin+image_margin_top # Center vertically on the canvas
+        logo.height+logo_margin+image_margin_top 
     )
 
-    # Create a mask with rounded corners for the second image using ImageDraw.rounded_rectangle
     mask = Image.new("RGBA", (image.width, image.height), (255, 255, 255, 0))
     mask_draw = ImageDraw.Draw(mask,"RGBA")
     mask_draw.rounded_rectangle((0, 0, image.width, image.height), radius=20, fill=(0,255,255,255))
 
 
-    # Paste the second image onto the canvas with rounded corners
     canvas.paste(image, image_position, mask)
 
 
-    # caption = "This is the caption for the second image with a rounded corner mask. It may be a longer text that needs wrapping."
     caption = Punchline
     wrapper = textwrap.TextWrapper(width=int(canvas_width * 0.03))
     word_list = wrapper.wrap(text=caption)
@@ -258,7 +241,6 @@ async def DynamicAdImage(
         int(image_position[1] + max_image_height+ text_height +20),
     )
 
-    # Draw the button
     button_draw.rounded_rectangle(
         [button_position[0]-20, button_position[1]-20, button_position[0] + cta_text_width+20, button_position[1] + cta_text_height+20],
         fill=color,
@@ -266,16 +248,14 @@ async def DynamicAdImage(
         radius=17,
     )
 
-    # cta_text_draw = ImageDraw.Draw(canvas)
 
 
 
     button_caption_position = (
         button_position[0],
-        button_position[1],  # Adjust the spacing as needed
+        button_position[1],  
     )
 
-    # Draw the button caption
     button_draw.multiline_text(button_caption_position, button_caption_new, font=btn_fnt, fill=(255, 255, 255), align="center")
 
 
